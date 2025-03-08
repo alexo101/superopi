@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -17,6 +18,7 @@ export default function Upload() {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
   const [supermarketSearch, setSupermarketSearch] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const form = useForm({
     resolver: zodResolver(insertProductSchema),
@@ -32,7 +34,30 @@ export default function Upload() {
 
   const mutation = useMutation({
     mutationFn: async (data: unknown) => {
-      const res = await apiRequest("POST", "/api/products", data);
+      if (!selectedFile) {
+        throw new Error("Por favor, selecciona una imagen");
+      }
+
+      // First, upload the image
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Error al subir la imagen");
+      }
+
+      const { imageUrl } = await uploadRes.json();
+
+      // Then, create the product with the image URL
+      const res = await apiRequest("POST", "/api/products", {
+        ...data,
+        imageUrl,
+      });
       return res.json();
     },
     onSuccess: () => {
@@ -55,6 +80,13 @@ export default function Upload() {
     s.toLowerCase().includes(supermarketSearch.toLowerCase())
   );
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
   return (
     <div className="max-w-xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold">Subir Producto</h1>
@@ -68,13 +100,22 @@ export default function Upload() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Valoración de calidad (0-10)</label>
-            <Slider
-              min={0}
-              max={10}
-              step={1}
-              value={[form.watch("rating")]}
-              onValueChange={([value]) => form.setValue("rating", value)}
-            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Slider
+                    min={0}
+                    max={10}
+                    step={1}
+                    value={[form.watch("rating")]}
+                    onValueChange={([value]) => form.setValue("rating", value)}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Valoración: {form.watch("rating")}/10</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <div>
             <Select
@@ -121,7 +162,15 @@ export default function Upload() {
             </Select>
           </div>
           <div>
-            <Input placeholder="URL de la imagen" {...form.register("imageUrl")} />
+            <Input 
+              type="file" 
+              accept="image/*"
+              onChange={handleFileChange}
+              className="cursor-pointer"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Formatos aceptados: JPG, PNG, GIF
+            </p>
           </div>
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
             {mutation.isPending ? "Subiendo..." : "Subir Producto"}

@@ -5,12 +5,9 @@ import { z } from "zod";
 export const categories = [
   { id: 1, name: "Alimentación", icon: "🍽️" },
   { id: 2, name: "Bebidas", icon: "🥤" },
-  { id: 3, name: "Frescos", icon: "🥬" },
-  { id: 4, name: "Congelados", icon: "❄️" },
-  { id: 5, name: "Limpieza", icon: "🧹" },
-  { id: 6, name: "Higiene", icon: "🧴" },
-  { id: 7, name: "Hogar", icon: "🏠" },
-  { id: 8, name: "Mascotas", icon: "🐾" }
+  { id: 3, name: "Higiene Personal", icon: "🧴" },
+  { id: 4, name: "Limpieza de hogar", icon: "🧹" },
+  { id: 5, name: "Mascotas", icon: "🐾" }
 ];
 
 export const supermarkets = [
