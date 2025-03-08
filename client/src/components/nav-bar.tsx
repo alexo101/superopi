@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Search, PlusCircle } from "lucide-react";
+import { Home, PlusCircle } from "lucide-react";
 
 export default function NavBar() {
   const [location] = useLocation();
@@ -11,19 +11,13 @@ export default function NavBar() {
           <Link href="/">
             <a className={`flex flex-col items-center ${location === "/" ? "text-primary" : "text-gray-600"}`}>
               <Home className="h-6 w-6" />
-              <span className="text-xs mt-1">Home</span>
-            </a>
-          </Link>
-          <Link href="/search">
-            <a className={`flex flex-col items-center ${location === "/search" ? "text-primary" : "text-gray-600"}`}>
-              <Search className="h-6 w-6" />
-              <span className="text-xs mt-1">Search</span>
+              <span className="text-xs mt-1">Inicio</span>
             </a>
           </Link>
           <Link href="/upload">
             <a className={`flex flex-col items-center ${location === "/upload" ? "text-primary" : "text-gray-600"}`}>
               <PlusCircle className="h-6 w-6" />
-              <span className="text-xs mt-1">Upload</span>
+              <span className="text-xs mt-1">Subir</span>
             </a>
           </Link>
         </div>

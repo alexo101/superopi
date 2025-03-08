@@ -34,14 +34,14 @@ export default function Upload() {
     },
     onSuccess: () => {
       toast({
-        title: "Product uploaded successfully",
-        description: "Your product has been added to the catalog",
+        title: "Producto subido correctamente",
+        description: "Tu producto ha sido añadido al catálogo",
       });
       setLocation("/");
     },
     onError: (error) => {
       toast({
-        title: "Failed to upload product",
+        title: "Error al subir el producto",
         description: error.message,
         variant: "destructive",
       });
@@ -50,17 +50,17 @@ export default function Upload() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Upload Product</h1>
+      <h1 className="text-3xl font-bold">Subir Producto</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
           <div>
-            <Input placeholder="Product Name" {...form.register("name")} />
+            <Input placeholder="Nombre del producto" {...form.register("name")} />
           </div>
           <div>
-            <Textarea placeholder="Description" {...form.register("description")} />
+            <Textarea placeholder="Descripción" {...form.register("description")} />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Quality Rating (0-10)</label>
+            <label className="block text-sm font-medium mb-2">Valoración de calidad (0-10)</label>
             <Slider
               min={0}
               max={10}
@@ -75,7 +75,7 @@ export default function Upload() {
               onValueChange={(value) => form.setValue("supermarket", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select Supermarket" />
+                <SelectValue placeholder="Seleccionar supermercado" />
               </SelectTrigger>
               <SelectContent>
                 {supermarkets.map((supermarket) => (
@@ -92,7 +92,7 @@ export default function Upload() {
               onValueChange={(value) => form.setValue("categoryId", parseInt(value))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select Category" />
+                <SelectValue placeholder="Seleccionar categoría" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -104,10 +104,10 @@ export default function Upload() {
             </Select>
           </div>
           <div>
-            <Input placeholder="Image URL" {...form.register("imageUrl")} />
+            <Input placeholder="URL de la imagen" {...form.register("imageUrl")} />
           </div>
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Uploading..." : "Upload Product"}
+            {mutation.isPending ? "Subiendo..." : "Subir Producto"}
           </Button>
         </form>
       </Form>

@@ -3,6 +3,7 @@ import { useParams } from "wouter";
 import { categories } from "@shared/schema";
 import ProductGrid from "@/components/product-grid";
 import { Skeleton } from "@/components/ui/skeleton";
+import SearchBar from "@/components/search-bar";
 
 export default function Category() {
   const { id } = useParams<{ id: string }>();
@@ -15,17 +16,7 @@ export default function Category() {
   });
 
   if (!category || isNaN(categoryId)) {
-    return <div>Category not found</div>;
-  }
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {[...Array(8)].map((_, i) => (
-          <Skeleton key={i} className="h-48" />
-        ))}
-      </div>
-    );
+    return <div>Categoría no encontrada</div>;
   }
 
   return (
@@ -34,7 +25,20 @@ export default function Category() {
         <span className="text-4xl">{category.icon}</span>
         <h1 className="text-3xl font-bold">{category.name}</h1>
       </div>
-      <ProductGrid products={products || []} />
+      <SearchBar />
+      {isLoading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <Skeleton key={i} className="h-48" />
+          ))}
+        </div>
+      ) : products?.length ? (
+        <ProductGrid products={products} />
+      ) : (
+        <p className="text-center text-muted-foreground">
+          No hay productos en esta categoría
+        </p>
+      )}
     </div>
   );
 }
