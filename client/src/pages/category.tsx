@@ -11,7 +11,7 @@ export default function Category() {
   const category = categories.find((c) => c.id === categoryId);
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["/api/products/category", categoryId],
+    queryKey: [`/api/products/category/${categoryId}`],
     enabled: !!categoryId && !isNaN(categoryId),
   });
 

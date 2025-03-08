@@ -53,7 +53,9 @@ export async function registerRoutes(app: Express) {
     if (isNaN(categoryId)) {
       return res.status(400).json({ message: "ID de categoría inválido" });
     }
+    console.log(`Fetching products for category ${categoryId}`);
     const products = await storage.getProductsByCategory(categoryId);
+    console.log(`Found ${products.length} products:`, products);
     res.json(products);
   });
 
