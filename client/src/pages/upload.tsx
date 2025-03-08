@@ -6,20 +6,23 @@ import { insertProductSchema, supermarkets, categories } from "@shared/schema";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Upload() {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
+  const [supermarketSearch, setSupermarketSearch] = useState("");
+
   const form = useForm({
     resolver: zodResolver(insertProductSchema),
     defaultValues: {
       name: "",
-      description: "",
+      brand: "",
       rating: 5,
       categoryId: 1,
       supermarket: "Mercadona",
@@ -48,6 +51,10 @@ export default function Upload() {
     },
   });
 
+  const filteredSupermarkets = supermarkets.filter(s => 
+    s.toLowerCase().includes(supermarketSearch.toLowerCase())
+  );
+
   return (
     <div className="max-w-xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold">Subir Producto</h1>
@@ -57,7 +64,7 @@ export default function Upload() {
             <Input placeholder="Nombre del producto" {...form.register("name")} />
           </div>
           <div>
-            <Textarea placeholder="Descripción" {...form.register("description")} />
+            <Input placeholder="Marca" {...form.register("brand")} />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Valoración de calidad (0-10)</label>
@@ -78,11 +85,21 @@ export default function Upload() {
                 <SelectValue placeholder="Seleccionar supermercado" />
               </SelectTrigger>
               <SelectContent>
-                {supermarkets.map((supermarket) => (
-                  <SelectItem key={supermarket} value={supermarket}>
-                    {supermarket}
-                  </SelectItem>
-                ))}
+                <div className="p-2">
+                  <Input
+                    placeholder="Buscar supermercado..."
+                    value={supermarketSearch}
+                    onChange={(e) => setSupermarketSearch(e.target.value)}
+                    className="mb-2"
+                  />
+                </div>
+                <ScrollArea className="h-[200px]">
+                  {filteredSupermarkets.map((supermarket) => (
+                    <SelectItem key={supermarket} value={supermarket}>
+                      {supermarket}
+                    </SelectItem>
+                  ))}
+                </ScrollArea>
               </SelectContent>
             </Select>
           </div>

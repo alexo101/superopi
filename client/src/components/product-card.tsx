@@ -21,8 +21,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         <CardTitle className="text-lg">{product.name}</CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-0">
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {product.description}
+        <p className="text-sm text-muted-foreground">
+          {product.brand}
         </p>
         <div className="flex items-center mt-2">
           <Star className="h-4 w-4 text-yellow-400 fill-current" />

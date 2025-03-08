@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -14,14 +14,21 @@ export const categories = [
 ];
 
 export const supermarkets = [
-  "Mercadona", "Carrefour", "Lidl", "Aldi", "Dia", "Eroski",
-  "Alcampo", "El Corte Inglés", "Hipercor", "Consum"
+  "Mercadona", "Carrefour", "Lidl", "Grupo Eroski", "Grupo Dia", 
+  "Consum Coop.", "Alcampo (Auchan)", "El Corte Inglés", "Aldi", 
+  "Condis", "Ahorramas", "Supercor", "BM Supermercados", "Gadisa",
+  "Bon Preu", "Covirán", "Froiz", "Masymas", "HiperDino", "E.Leclerc",
+  "Spar", "Uvesco", "SuperSol", "Caprabo", "Makro", "La Despensa",
+  "Casa Ametller", "Lupa", "Alimerka", "La Plaza de Dia", "Cash Fresh",
+  "Economy Cash", "Jespac", "Hiper Usera", "Novavenda", 
+  "Autoservicios Familia", "Suma", "Ressa", "Charter", "Punt Fresc",
+  "El Árbol", "Cash EcoFamilia", "Hiperber"
 ] as const;
 
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  description: text("description").notNull(),
+  brand: text("brand").notNull(),
   rating: integer("rating").notNull(),
   categoryId: integer("category_id").notNull(),
   supermarket: text("supermarket").notNull(),
