@@ -1,4 +1,6 @@
-import { Product, InsertProduct } from "@shared/schema";
+import { products, type Product, type InsertProduct } from "@shared/schema";
+import { db } from "./db";
+import { eq, like } from "drizzle-orm";
 
 export interface IStorage {
   getProducts(): Promise<Product[]>;
@@ -7,40 +9,35 @@ export interface IStorage {
   searchProducts(query: string): Promise<Product[]>;
 }
 
-export class MemStorage implements IStorage {
-  private products: Map<number, Product>;
-  private currentId: number;
-
-  constructor() {
-    this.products = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async getProducts(): Promise<Product[]> {
-    return Array.from(this.products.values());
+    return await db.select().from(products);
   }
 
   async getProductsByCategory(categoryId: number): Promise<Product[]> {
-    return Array.from(this.products.values()).filter(
-      (product) => product.categoryId === categoryId
-    );
+    return await db
+      .select()
+      .from(products)
+      .where(eq(products.categoryId, categoryId));
   }
 
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
-    const id = this.currentId++;
-    const product: Product = { ...insertProduct, id };
-    this.products.set(id, product);
+    const [product] = await db
+      .insert(products)
+      .values(insertProduct)
+      .returning();
     return product;
   }
 
   async searchProducts(query: string): Promise<Product[]> {
-    const lowercaseQuery = query.toLowerCase();
-    return Array.from(this.products.values()).filter(
-      (product) =>
-        product.name.toLowerCase().includes(lowercaseQuery) ||
-        product.description.toLowerCase().includes(lowercaseQuery)
-    );
+    const searchPattern = `%${query.toLowerCase()}%`;
+    return await db
+      .select()
+      .from(products)
+      .where(
+        like(products.name.toLowerCase(), searchPattern)
+      );
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
