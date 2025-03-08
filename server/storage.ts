@@ -1,6 +1,6 @@
 import { products, type Product, type InsertProduct } from "@shared/schema";
 import { db } from "./db";
-import { eq, like } from "drizzle-orm";
+import { eq, like, sql } from "drizzle-orm";
 
 export interface IStorage {
   getProducts(): Promise<Product[]>;
@@ -35,7 +35,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(products)
       .where(
-        like(products.name.toLowerCase(), searchPattern)
+        like(sql`LOWER(${products.name})`, searchPattern)
       );
   }
 }
