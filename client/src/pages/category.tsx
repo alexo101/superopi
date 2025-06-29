@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
-import { categories } from "@shared/schema";
+import { categories, type Product } from "@shared/schema";
 import ProductGrid from "@/components/product-grid";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchBar from "@/components/search-bar";
@@ -10,8 +10,8 @@ export default function Category() {
   const categoryId = parseInt(id);
   const category = categories.find((c) => c.id === categoryId);
 
-  const { data: products, isLoading } = useQuery({
-    queryKey: [`/api/products/category/${categoryId}`],
+  const { data: products = [], isLoading } = useQuery<Product[]>({
+    queryKey: ["/api/products/category", categoryId],
     enabled: !!categoryId && !isNaN(categoryId),
   });
 
@@ -32,8 +32,8 @@ export default function Category() {
             <Skeleton key={i} className="h-48" />
           ))}
         </div>
-      ) : products?.length ? (
-        <ProductGrid products={products} />
+      ) : (products as Product[]).length > 0 ? (
+        <ProductGrid products={products as Product[]} />
       ) : (
         <p className="text-center text-muted-foreground">
           No hay productos en esta categoría

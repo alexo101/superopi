@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { insertProductSchema, supermarkets, categories } from "@shared/schema";
 import { Form } from "@/components/ui/form";
@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 export default function Upload() {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [supermarketSearch, setSupermarketSearch] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -29,11 +30,13 @@ export default function Upload() {
       categoryId: 1,
       supermarket: "Mercadona",
       imageUrl: "",
+      sweetness: 5,
+      saltiness: 5,
     },
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: unknown) => {
+    mutationFn: async (data: any) => {
       if (!selectedFile) {
         throw new Error("Por favor, selecciona una imagen");
       }
@@ -54,13 +57,18 @@ export default function Upload() {
       const { imageUrl } = await uploadRes.json();
 
       // Then, create the product with the image URL
-      const res = await apiRequest("POST", "/api/products", {
+      const productData = {
         ...data,
         imageUrl,
-      });
+      };
+      const res = await apiRequest("POST", "/api/products", productData);
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Invalidate all product-related queries
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/products/category"] });
+      
       toast({
         title: "Producto subido correctamente",
         description: "Tu producto ha sido añadido al catálogo",
@@ -160,6 +168,44 @@ export default function Upload() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Nivel de dulzor (1-10)</label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Slider
+                    min={1}
+                    max={10}
+                    step={1}
+                    value={[form.watch("sweetness")]}
+                    onValueChange={([value]) => form.setValue("sweetness", value)}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{form.watch("sweetness") <= 3 ? "Poco dulce" : form.watch("sweetness") >= 8 ? "Muy dulce" : "Dulzor medio"} ({form.watch("sweetness")}/10)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Nivel de salinidad (1-10)</label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Slider
+                    min={1}
+                    max={10}
+                    step={1}
+                    value={[form.watch("saltiness")]}
+                    onValueChange={([value]) => form.setValue("saltiness", value)}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{form.watch("saltiness") <= 3 ? "Poco salado" : form.watch("saltiness") >= 8 ? "Muy salado" : "Salinidad media"} ({form.watch("saltiness")}/10)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <div>
             <Input 

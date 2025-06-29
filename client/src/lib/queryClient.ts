@@ -29,7 +29,23 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Handle different query key formats
+    let url: string;
+    if (queryKey.length === 1) {
+      // Simple URL
+      url = queryKey[0] as string;
+    } else if (queryKey[0] === "/api/products/category") {
+      // Category query with ID
+      url = `/api/products/category/${queryKey[1]}`;
+    } else if (queryKey[0] === "/api/products/search") {
+      // Search query with parameter
+      url = `/api/products/search?q=${encodeURIComponent(queryKey[1] as string)}`;
+    } else {
+      // Default fallback
+      url = queryKey.join('/');
+    }
+
+    const res = await fetch(url, {
       credentials: "include",
     });
 
