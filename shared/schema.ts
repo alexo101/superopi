@@ -32,6 +32,8 @@ export const products = pgTable("products", {
   imageUrl: text("image_url").notNull(),
   sweetness: integer("sweetness").notNull().default(5),
   saltiness: integer("saltiness").notNull().default(5),
+  smell: integer("smell").notNull().default(5),
+  effectiveness: integer("effectiveness").notNull().default(5),
 });
 
 export const insertProductSchema = createInsertSchema(products)
@@ -41,6 +43,8 @@ export const insertProductSchema = createInsertSchema(products)
     categoryId: z.number().min(1).max(categories.length),
     sweetness: z.number().min(1).max(10).default(5),
     saltiness: z.number().min(1).max(10).default(5),
+    smell: z.number().min(1).max(10).default(5),
+    effectiveness: z.number().min(1).max(10).default(5),
   });
 
 export type InsertProduct = z.infer<typeof insertProductSchema>;

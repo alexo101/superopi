@@ -32,6 +32,8 @@ export default function Upload() {
       imageUrl: "",
       sweetness: 5,
       saltiness: 5,
+      smell: 5,
+      effectiveness: 5,
     },
   });
 
@@ -208,6 +210,50 @@ export default function Upload() {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{form.watch("saltiness") <= 3 ? "Poco salado" : form.watch("saltiness") >= 8 ? "Muy salado" : "Salinidad media"} ({form.watch("saltiness")}/10)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+          {/* Show smell for Higiene Personal (3) and Limpieza del hogar (4) */}
+          {(form.watch("categoryId") === 3 || form.watch("categoryId") === 4) && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Olor (1-10)</label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Slider
+                      min={1}
+                      max={10}
+                      step={1}
+                      value={[form.watch("smell")]}
+                      onValueChange={([value]) => form.setValue("smell", value)}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{form.watch("smell") <= 3 ? "Olor suave" : form.watch("smell") >= 8 ? "Olor fuerte" : "Olor medio"} ({form.watch("smell")}/10)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+          {/* Show effectiveness only for Limpieza del hogar (4) */}
+          {form.watch("categoryId") === 4 && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Efectos (1-10)</label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Slider
+                      min={1}
+                      max={10}
+                      step={1}
+                      value={[form.watch("effectiveness")]}
+                      onValueChange={([value]) => form.setValue("effectiveness", value)}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{form.watch("effectiveness") <= 3 ? "Poco efectivo" : form.watch("effectiveness") >= 8 ? "Muy efectivo" : "Efectividad media"} ({form.watch("effectiveness")}/10)</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
