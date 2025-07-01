@@ -107,25 +107,6 @@ export default function Upload() {
             <Input placeholder="Marca" {...form.register("brand")} />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Valoración de calidad (0-10)</label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Slider
-                    min={0}
-                    max={10}
-                    step={1}
-                    value={[form.watch("rating")]}
-                    onValueChange={([value]) => form.setValue("rating", value)}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Valoración: {form.watch("rating")}/10</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          <div>
             <Select
               value={form.watch("supermarket")}
               onValueChange={(value) => form.setValue("supermarket", value)}
@@ -170,43 +151,68 @@ export default function Upload() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Nivel de dulzor (1-10)</label>
+            <label className="block text-sm font-medium mb-2">Valoración de calidad (0-10)</label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Slider
-                    min={1}
+                    min={0}
                     max={10}
                     step={1}
-                    value={[form.watch("sweetness")]}
-                    onValueChange={([value]) => form.setValue("sweetness", value)}
+                    value={[form.watch("rating")]}
+                    onValueChange={([value]) => form.setValue("rating", value)}
                   />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{form.watch("sweetness") <= 3 ? "Poco dulce" : form.watch("sweetness") >= 8 ? "Muy dulce" : "Dulzor medio"} ({form.watch("sweetness")}/10)</p>
+                  <p>Valoración: {form.watch("rating")}/10</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Nivel de salinidad (1-10)</label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Slider
-                    min={1}
-                    max={10}
-                    step={1}
-                    value={[form.watch("saltiness")]}
-                    onValueChange={([value]) => form.setValue("saltiness", value)}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{form.watch("saltiness") <= 3 ? "Poco salado" : form.watch("saltiness") >= 8 ? "Muy salado" : "Salinidad media"} ({form.watch("saltiness")}/10)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          {/* Show sweetness for Alimentación (1) and Bebidas (2) */}
+          {(form.watch("categoryId") === 1 || form.watch("categoryId") === 2) && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Nivel de dulzor (1-10)</label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Slider
+                      min={1}
+                      max={10}
+                      step={1}
+                      value={[form.watch("sweetness")]}
+                      onValueChange={([value]) => form.setValue("sweetness", value)}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{form.watch("sweetness") <= 3 ? "Poco dulce" : form.watch("sweetness") >= 8 ? "Muy dulce" : "Dulzor medio"} ({form.watch("sweetness")}/10)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+          {/* Show saltiness only for Alimentación (1) */}
+          {form.watch("categoryId") === 1 && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Nivel de salinidad (1-10)</label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Slider
+                      min={1}
+                      max={10}
+                      step={1}
+                      value={[form.watch("saltiness")]}
+                      onValueChange={([value]) => form.setValue("saltiness", value)}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{form.watch("saltiness") <= 3 ? "Poco salado" : form.watch("saltiness") >= 8 ? "Muy salado" : "Salinidad media"} ({form.watch("saltiness")}/10)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
           <div>
             <Input 
               type="file" 
