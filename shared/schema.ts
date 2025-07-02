@@ -6,7 +6,7 @@ export const categories = [
   { id: 1, name: "Alimentación", icon: "🍽️" },
   { id: 2, name: "Bebidas", icon: "🥤" },
   { id: 3, name: "Higiene Personal", icon: "🧴" },
-  { id: 4, name: "Limpieza de hogar", icon: "🧹" },
+  { id: 4, name: "Limpieza hogar", icon: "🧹" },
   { id: 5, name: "Mascotas", icon: "🐾" }
 ];
 
