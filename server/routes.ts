@@ -7,6 +7,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs/promises";
 import express from 'express';
+import { setupAuth } from "./auth";
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -30,6 +31,9 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express) {
+  // Setup authentication
+  setupAuth(app);
+
   // Ensure uploads directory exists
   await fs.mkdir("./uploads", { recursive: true });
 

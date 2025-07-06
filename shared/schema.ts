@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, varchar, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -21,6 +21,14 @@ export const supermarkets = [
   "Autoservicios Familia", "Suma", "Ressa", "Charter", "Punt Fresc",
   "El Árbol", "Cash EcoFamilia", "Hiperber"
 ] as const;
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  username: varchar("username", { length: 10 }).notNull().unique(),
+  password: text("password").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
@@ -49,3 +57,20 @@ export const insertProductSchema = createInsertSchema(products)
 
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type Product = typeof products.$inferSelect;
+
+export const insertUserSchema = createInsertSchema(users)
+  .omit({ id: true, createdAt: true })
+  .extend({
+    email: z.string().email("Email inválido"),
+    username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres").max(10, "El nombre de usuario no puede tener más de 10 caracteres"),
+    password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  });
+
+export const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(1, "La contraseña es requerida"),
+});
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = typeof users.$inferSelect;
+export type LoginCredentials = z.infer<typeof loginSchema>;
