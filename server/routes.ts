@@ -1,7 +1,8 @@
 import type { Express } from "express";
-import { createServer } from "http";
+import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertProductSchema } from "@shared/schema";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { ZodError } from "zod";
 import multer from "multer";
 import path from "path";
@@ -29,13 +30,28 @@ const upload = multer({
   }
 });
 
-export async function registerRoutes(app: Express) {
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth middleware
+  await setupAuth(app);
+
   // Ensure uploads directory exists
   await fs.mkdir("./uploads", { recursive: true });
 
   app.use("/uploads", express.static("uploads"));
 
-  app.post("/api/upload", upload.single("image"), (req, res) => {
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  app.post("/api/upload", isAuthenticated, upload.single("image"), (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "No se ha subido ningún archivo" });
     }
@@ -68,7 +84,7 @@ export async function registerRoutes(app: Express) {
     res.json(products);
   });
 
-  app.post("/api/products", async (req, res) => {
+  app.post("/api/products", isAuthenticated, async (req, res) => {
     try {
       const product = insertProductSchema.parse(req.body);
       const created = await storage.createProduct(product);

@@ -13,6 +13,7 @@ Superopi is a full-stack web application for rating and reviewing supermarket pr
 - **UI Components**: Radix UI primitives with shadcn/ui component library
 - **Styling**: Tailwind CSS with custom theme configuration
 - **Form Handling**: React Hook Form with Zod validation
+- **Authentication**: Replit Auth with OpenID Connect
 - **Build Tool**: Vite with custom plugin configuration
 
 ### Backend Architecture
@@ -20,6 +21,7 @@ Superopi is a full-stack web application for rating and reviewing supermarket pr
 - **Language**: TypeScript with ES modules
 - **Database ORM**: Drizzle ORM with PostgreSQL dialect
 - **Database Provider**: Neon Database (serverless PostgreSQL)
+- **Authentication**: Replit Auth with Passport.js strategy
 - **File Upload**: Multer middleware for image handling
 - **Session Management**: Express sessions with PostgreSQL store
 - **Development**: Hot module replacement with Vite integration
@@ -123,3 +125,9 @@ Preferred communication style: Simple, everyday language.
 
 Changelog:
 - July 01, 2025. Initial setup
+- July 06, 2025. Implemented Replit Auth integration with OpenID Connect
+  - Added user authentication and session management
+  - Created landing page for unauthenticated users
+  - Added logout functionality to home page
+  - Implemented authorization error handling throughout app
+  - Updated routing to show different pages based on auth status
