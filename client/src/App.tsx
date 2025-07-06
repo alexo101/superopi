@@ -9,6 +9,7 @@ import Home from "@/pages/home";
 import Upload from "@/pages/upload";
 import Category from "@/pages/category";
 import Landing from "@/pages/landing";
+import AuthPage from "@/pages/auth-page";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -16,7 +17,10 @@ function Router() {
   return (
     <Switch>
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/auth" component={AuthPage} />
+        </>
       ) : (
         <>
           <Route path="/" component={Home} />

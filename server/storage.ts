@@ -4,7 +4,7 @@ import {
   type Product,
   type InsertProduct,
   type User,
-  type UpsertUser,
+  type InsertUser,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, like, sql } from "drizzle-orm";
@@ -16,9 +16,11 @@ export interface IStorage {
   createProduct(product: InsertProduct): Promise<Product>;
   searchProducts(query: string): Promise<Product[]>;
   
-  // User operations (mandatory for Replit Auth)
-  getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
+  // User operations for authentication
+  getUser(id: number): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -52,22 +54,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   // User operations (mandatory for Replit Auth)
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ ...userData, updatedAt: new Date() })
+      .where(eq(users.id, id))
       .returning();
     return user;
   }

@@ -125,9 +125,10 @@ Preferred communication style: Simple, everyday language.
 
 Changelog:
 - July 01, 2025. Initial setup
-- July 06, 2025. Implemented Replit Auth integration with OpenID Connect
-  - Added user authentication and session management
-  - Created landing page for unauthenticated users
+- July 06, 2025. Implemented simple authentication system
+  - Added Google OAuth and email/password authentication
+  - Created comprehensive authentication page with login/register forms
   - Added logout functionality to home page
   - Implemented authorization error handling throughout app
   - Updated routing to show different pages based on auth status
+  - Replaced Replit Auth with simpler authentication system per user request

@@ -2,11 +2,39 @@ import { categories } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import CategoryCard from "@/components/category-card";
 import SearchBar from "@/components/search-bar";
 
 export default function Home() {
   const { user } = useAuth();
+  const { toast } = useToast();
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", "/api/logout");
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(["/api/user"], null);
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión exitosamente",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo cerrar la sesión",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   return (
     <div className="space-y-6">
@@ -15,7 +43,8 @@ export default function Home() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => window.location.href = "/api/logout"}
+          onClick={handleLogout}
+          disabled={logoutMutation.isPending}
           className="text-gray-500"
         >
           <LogOut className="h-5 w-5" />
