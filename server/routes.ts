@@ -7,7 +7,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs/promises";
 import express from 'express';
-import { setupAuth } from "./auth";
+import { setupAuth, requireAuth } from "./auth";
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -72,9 +72,11 @@ export async function registerRoutes(app: Express) {
     res.json(products);
   });
 
-  app.post("/api/products", async (req, res) => {
+  app.post("/api/products", requireAuth, async (req: any, res) => {
     try {
-      const product = insertProductSchema.parse(req.body);
+      const userId = req.session?.userId;
+      const productData = { ...req.body, userId };
+      const product = insertProductSchema.parse(productData);
       const created = await storage.createProduct(product);
       res.status(201).json(created);
     } catch (error) {
@@ -82,6 +84,28 @@ export async function registerRoutes(app: Express) {
         return res.status(400).json({ message: "Datos del producto inválidos", errors: error.errors });
       }
       throw error;
+    }
+  });
+
+  // New endpoints for user contributions
+  app.get("/api/my-products", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId;
+      const products = await storage.getProductsByUser(userId);
+      res.json(products);
+    } catch (error) {
+      console.error("Error fetching user products:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  });
+
+  app.get("/api/tops", async (req, res) => {
+    try {
+      const topUsers = await storage.getTopContributors();
+      res.json(topUsers);
+    } catch (error) {
+      console.error("Error fetching top contributors:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
     }
   });
 

@@ -42,6 +42,8 @@ export const products = pgTable("products", {
   saltiness: integer("saltiness").notNull().default(5),
   smell: integer("smell").notNull().default(5),
   effectiveness: integer("effectiveness").notNull().default(5),
+  userId: integer("user_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertProductSchema = createInsertSchema(products)

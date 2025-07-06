@@ -1,23 +1,10 @@
 import { Link, useLocation } from "wouter";
-import { Home, PlusCircle, LogOut, User } from "lucide-react";
+import { Home, PlusCircle, Trophy, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export default function NavBar() {
   const [location] = useLocation();
-  const { user, logoutMutation } = useAuth();
-
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
+  const { user } = useAuth();
 
   if (!user) return null;
 
@@ -29,31 +16,21 @@ export default function NavBar() {
             <Home className="h-6 w-6" />
             <span className="text-xs mt-1">Inicio</span>
           </Link>
+          
+          <Link href="/tops" className={`flex flex-col items-center ${location === "/tops" ? "text-primary" : "text-gray-600"}`}>
+            <Trophy className="h-6 w-6" />
+            <span className="text-xs mt-1">Tops</span>
+          </Link>
+          
           <Link href="/upload" className={`flex flex-col items-center ${location === "/upload" ? "text-primary" : "text-gray-600"}`}>
             <PlusCircle className="h-6 w-6" />
             <span className="text-xs mt-1">Subir</span>
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex flex-col items-center p-2 h-auto">
-                <User className="h-6 w-6" />
-                <span className="text-xs mt-1">Perfil</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>
-                <div className="flex flex-col">
-                  <span className="font-semibold">{user.username}</span>
-                  <span className="text-xs text-gray-500">{user.email}</span>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                <LogOut className="mr-2 h-4 w-4" />
-                Cerrar sesión
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          
+          <Link href="/my-opis" className={`flex flex-col items-center ${location === "/my-opis" ? "text-primary" : "text-gray-600"}`}>
+            <BookOpen className="h-6 w-6" />
+            <span className="text-xs mt-1">Mis Opis</span>
+          </Link>
         </div>
       </div>
     </nav>

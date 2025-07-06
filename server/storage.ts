@@ -13,6 +13,10 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserById(id: number): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  
+  // User contributions methods
+  getProductsByUser(userId: number): Promise<Product[]>;
+  getTopContributors(): Promise<{ username: string; contributions: number; rank: number }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -75,6 +79,33 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async getProductsByUser(userId: number): Promise<Product[]> {
+    return await db
+      .select()
+      .from(products)
+      .where(eq(products.userId, userId))
+      .orderBy(sql`${products.createdAt} DESC`);
+  }
+
+  async getTopContributors(): Promise<{ username: string; contributions: number; rank: number }[]> {
+    const result = await db
+      .select({
+        username: users.username,
+        contributions: sql<number>`COUNT(${products.id})::int`,
+      })
+      .from(users)
+      .leftJoin(products, eq(users.id, products.userId))
+      .groupBy(users.id, users.username)
+      .having(sql`COUNT(${products.id}) > 0`)
+      .orderBy(sql`COUNT(${products.id}) DESC`)
+      .limit(10);
+
+    return result.map((user, index) => ({
+      ...user,
+      rank: index + 1,
+    }));
   }
 }
 

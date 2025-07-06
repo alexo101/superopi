@@ -14,6 +14,7 @@ Superopi is a full-stack web application for rating and reviewing supermarket pr
 - **Styling**: Tailwind CSS with custom theme configuration
 - **Form Handling**: React Hook Form with Zod validation
 - **Build Tool**: Vite with custom plugin configuration
+- **Authentication**: Context-based auth provider with session management
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js server
@@ -22,13 +23,20 @@ Superopi is a full-stack web application for rating and reviewing supermarket pr
 - **Database Provider**: Neon Database (serverless PostgreSQL)
 - **File Upload**: Multer middleware for image handling
 - **Session Management**: Express sessions with PostgreSQL store
+- **Authentication**: bcrypt password hashing with session-based auth
 - **Development**: Hot module replacement with Vite integration
 
 ### Database Schema
+- **Users Table**: User authentication and profile information
+  - Email, username (max 10 chars), hashed password
+  - Creation timestamp for user registration tracking
 - **Products Table**: Core entity storing product information
   - Basic info: name, brand, rating, category, supermarket
   - Taste attributes: sweetness, saltiness (1-10 scale)
   - Image URL for product photos
+  - User attribution: userId foreign key linking to creator
+  - Creation timestamp for contribution tracking
+- **Sessions Table**: User session storage for authentication
 - **Categories**: Predefined categories (Food, Drinks, Personal Care, Home Cleaning, Pets)
 - **Supermarkets**: Comprehensive list of Spanish supermarket chains
 
@@ -51,7 +59,11 @@ Superopi is a full-stack web application for rating and reviewing supermarket pr
 - **Category Navigation**: Icon-based category selection
 - **Search Functionality**: Real-time product search
 - **Upload Form**: Multi-step form with image upload and validation
-- **Mobile Navigation**: Bottom navigation bar for mobile experience
+- **Authentication Pages**: Login/register forms with validation
+- **User Profile**: Top-right dropdown with user info and logout
+- **Bottom Navigation**: Four-section navigation (Inicio, Tops, Subir, Mis Opis)
+- **Leaderboard**: Top contributors ranking by contribution count
+- **User Contributions**: Personal product history with detailed view
 
 ### UI System
 - **Design System**: shadcn/ui components with Radix UI primitives

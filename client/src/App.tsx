@@ -10,6 +10,9 @@ import Home from "@/pages/home";
 import Upload from "@/pages/upload";
 import Category from "@/pages/category";
 import Auth from "@/pages/auth";
+import Tops from "@/pages/tops";
+import MyOpis from "@/pages/my-opis";
+import TopBar from "@/components/top-bar";
 
 function Router() {
   return (
@@ -30,6 +33,16 @@ function Router() {
           <Category />
         </ProtectedRoute>
       </Route>
+      <Route path="/tops">
+        <ProtectedRoute>
+          <Tops />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/my-opis">
+        <ProtectedRoute>
+          <MyOpis />
+        </ProtectedRoute>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -40,6 +53,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <div className="min-h-screen bg-background">
+          <TopBar />
           <main className="container mx-auto px-4 py-4 pb-20">
             <Router />
           </main>
