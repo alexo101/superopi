@@ -54,7 +54,7 @@ function App() {
       <AuthProvider>
         <div className="min-h-screen bg-background">
           <TopBar />
-          <main className="container mx-auto px-4 py-4 pb-20">
+          <main className="max-w-6xl mx-auto px-4 py-4 pb-20">
             <Router />
           </main>
           <NavBar />
