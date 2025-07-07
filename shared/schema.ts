@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, varchar, timestamp, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -42,6 +42,7 @@ export const products = pgTable("products", {
   saltiness: integer("saltiness").notNull().default(5),
   smell: integer("smell").notNull().default(5),
   effectiveness: integer("effectiveness").notNull().default(5),
+  price: decimal("price", { precision: 10, scale: 2 }),
   userId: integer("user_id").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -55,6 +56,7 @@ export const insertProductSchema = createInsertSchema(products)
     saltiness: z.number().min(1).max(10).default(5),
     smell: z.number().min(1).max(10).default(5),
     effectiveness: z.number().min(1).max(10).default(5),
+    price: z.number().min(0).optional(),
   });
 
 export type InsertProduct = z.infer<typeof insertProductSchema>;

@@ -34,6 +34,7 @@ export default function Upload() {
       saltiness: 0,
       smell: 0,
       effectiveness: 0,
+      price: 0,
     },
   });
 
@@ -99,7 +100,7 @@ export default function Upload() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Subir Producto</h1>
+      <h1 className="text-3xl font-bold">Dame tu Opi</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
           <div>
@@ -114,7 +115,7 @@ export default function Upload() {
               onValueChange={(value) => form.setValue("supermarket", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar supermercado" />
+                <SelectValue placeholder="Selecciona súper" />
               </SelectTrigger>
               <SelectContent>
                 <div className="p-2">
@@ -151,6 +152,14 @@ export default function Upload() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <Input 
+              placeholder="Precio (€)" 
+              type="number" 
+              step="0.01"
+              {...form.register("price", { valueAsNumber: true })} 
+            />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Valoración de calidad (0-10)</label>

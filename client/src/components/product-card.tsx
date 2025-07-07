@@ -28,6 +28,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           <Star className="h-4 w-4 text-yellow-400 fill-current" />
           <span className="ml-1 text-sm">{product.rating}/10</span>
         </div>
+        {product.price && (
+          <div className="text-lg font-semibold text-green-600 mt-2">
+            {product.price}€
+          </div>
+        )}
         <span className="text-xs text-muted-foreground mt-2 block">
           {product.supermarket}
         </span>
