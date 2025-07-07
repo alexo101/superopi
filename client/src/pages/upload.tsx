@@ -28,7 +28,7 @@ export default function Upload() {
       brand: "",
       rating: 0,
       categoryId: 1,
-      supermarket: "Mercadona",
+      supermarket: "",
       imageUrl: "",
       sweetness: 0,
       saltiness: 0,
@@ -115,7 +115,7 @@ export default function Upload() {
               onValueChange={(value) => form.setValue("supermarket", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecciona súper" />
+                <SelectValue placeholder="Súper donde lo has comprado" />
               </SelectTrigger>
               <SelectContent>
                 <div className="p-2">
