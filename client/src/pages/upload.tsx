@@ -26,14 +26,14 @@ export default function Upload() {
     defaultValues: {
       name: "",
       brand: "",
-      rating: 5,
+      rating: 0,
       categoryId: 1,
       supermarket: "Mercadona",
       imageUrl: "",
-      sweetness: 5,
-      saltiness: 5,
-      smell: 5,
-      effectiveness: 5,
+      sweetness: 0,
+      saltiness: 0,
+      smell: 0,
+      effectiveness: 0,
     },
   });
 
