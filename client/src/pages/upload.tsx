@@ -73,7 +73,7 @@ export default function Upload() {
       queryClient.invalidateQueries({ queryKey: ["/api/products/category"] });
       
       toast({
-        title: "Producto subido correctamente",
+        title: "Opinión añadida",
         description: "Tu producto ha sido añadido al catálogo",
       });
       setLocation("/");
@@ -102,7 +102,11 @@ export default function Upload() {
     <div className="max-w-xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold">Dame tu Opi</h1>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
+        <form onSubmit={form.handleSubmit((data) => {
+          console.log("Form data:", data);
+          console.log("Form errors:", form.formState.errors);
+          mutation.mutate(data);
+        })} className="space-y-4">
           <div>
             <Input placeholder="Nombre del producto" {...form.register("name")} />
           </div>
@@ -183,12 +187,12 @@ export default function Upload() {
           {/* Show sweetness for Alimentación (1) and Bebidas (2) */}
           {(form.watch("categoryId") === 1 || form.watch("categoryId") === 2) && (
             <div>
-              <label className="block text-sm font-medium mb-2">Nivel de dulzor (1-10)</label>
+              <label className="block text-sm font-medium mb-2">Nivel de dulzor (0-10)</label>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Slider
-                      min={1}
+                      min={0}
                       max={10}
                       step={1}
                       value={[form.watch("sweetness")]}
@@ -205,12 +209,12 @@ export default function Upload() {
           {/* Show saltiness only for Alimentación (1) */}
           {form.watch("categoryId") === 1 && (
             <div>
-              <label className="block text-sm font-medium mb-2">Nivel de salinidad (1-10)</label>
+              <label className="block text-sm font-medium mb-2">Nivel de salinidad (0-10)</label>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Slider
-                      min={1}
+                      min={0}
                       max={10}
                       step={1}
                       value={[form.watch("saltiness")]}
@@ -227,12 +231,12 @@ export default function Upload() {
           {/* Show smell for Higiene Personal (3) and Limpieza del hogar (4) */}
           {(form.watch("categoryId") === 3 || form.watch("categoryId") === 4) && (
             <div>
-              <label className="block text-sm font-medium mb-2">Olor (1-10)</label>
+              <label className="block text-sm font-medium mb-2">Olor (0-10)</label>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Slider
-                      min={1}
+                      min={0}
                       max={10}
                       step={1}
                       value={[form.watch("smell")]}
@@ -249,12 +253,12 @@ export default function Upload() {
           {/* Show effectiveness only for Limpieza del hogar (4) */}
           {form.watch("categoryId") === 4 && (
             <div>
-              <label className="block text-sm font-medium mb-2">Efectos (1-10)</label>
+              <label className="block text-sm font-medium mb-2">Efectos (0-10)</label>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Slider
-                      min={1}
+                      min={0}
                       max={10}
                       step={1}
                       value={[form.watch("effectiveness")]}
@@ -269,6 +273,7 @@ export default function Upload() {
             </div>
           )}
           <div>
+            <label className="block text-sm font-medium mb-2">Subir foto</label>
             <Input 
               type="file" 
               accept="image/*"

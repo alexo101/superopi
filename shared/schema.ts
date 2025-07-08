@@ -52,10 +52,10 @@ export const insertProductSchema = createInsertSchema(products)
     rating: z.number().min(0).max(10),
     supermarket: z.enum(supermarkets),
     categoryId: z.number().min(1).max(categories.length),
-    sweetness: z.number().min(1).max(10).default(5),
-    saltiness: z.number().min(1).max(10).default(5),
-    smell: z.number().min(1).max(10).default(5),
-    effectiveness: z.number().min(1).max(10).default(5),
+    sweetness: z.number().min(0).max(10).default(0),
+    saltiness: z.number().min(0).max(10).default(0),
+    smell: z.number().min(0).max(10).default(0),
+    effectiveness: z.number().min(0).max(10).default(0),
     price: z.number().min(0).optional(),
   });
 
