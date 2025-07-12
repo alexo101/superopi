@@ -10,13 +10,11 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const category = categories.find(c => c.id === product.categoryId);
-  
   return (
-    <Card className="w-full max-w-4xl mx-auto overflow-hidden hover:shadow-lg transition-shadow mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-        {/* Image Section */}
-        <div className="space-y-4">
+    <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow mb-4">
+      <div className="grid grid-cols-3 gap-3 p-4">
+        {/* Image Section - Reduced to 1/3 of card width */}
+        <div className="col-span-1">
           <AspectRatio ratio={1}>
             <img
               src={product.imageUrl}
@@ -26,18 +24,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           </AspectRatio>
         </div>
 
-        {/* Product Information */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-2xl">{product.name}</CardTitle>
-              {category && (
-                <Badge variant="secondary" className="text-sm">
-                  {category.icon} {category.name}
-                </Badge>
-              )}
-            </div>
-            <p className="text-lg text-muted-foreground font-medium">
+        {/* Product Information - Takes 2/3 of card width */}
+        <div className="col-span-2 space-y-2">
+          <div className="space-y-1">
+            <CardTitle className="text-lg font-bold leading-tight">{product.name}</CardTitle>
+            <p className="text-sm text-muted-foreground">
               {product.brand}
             </p>
           </div>
@@ -45,104 +36,52 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Price and Store */}
           <div className="flex items-center justify-between">
             {product.price && (
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-lg font-bold text-green-600">
                 {product.price}€
               </div>
             )}
             <div className="flex items-center gap-1 text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span className="text-sm">{product.supermarket}</span>
+              <MapPin className="h-3 w-3" />
+              <span className="text-xs">{product.supermarket}</span>
             </div>
           </div>
 
-          {/* Overall Rating */}
+          {/* Rating and Reviews */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-yellow-400 fill-current" />
-              <span className="text-xl font-semibold">{product.rating}/10</span>
-              <span className="text-sm text-muted-foreground">Valoración general</span>
+            <div className="flex items-center gap-1">
+              <Star className="h-4 w-4 text-yellow-400 fill-current" />
+              <span className="text-sm font-semibold">{product.rating}/10</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-sm">{product.reviewCount || 1} opiniones</span>
+              <MessageCircle className="h-3 w-3" />
+              <span className="text-xs">{product.reviewCount || 1} opiniones</span>
             </div>
           </div>
 
-          {/* Detailed Ratings */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Compact Detailed Ratings */}
+          <div className="flex flex-wrap gap-2 text-xs">
             {product.sweetness > 0 && (
-              <div className="space-y-1">
-                <div className="text-sm font-medium">Dulzor</div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-secondary rounded-full h-2">
-                    <div 
-                      className="bg-pink-500 h-2 rounded-full" 
-                      style={{ width: `${(product.sweetness / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-sm">{product.sweetness}/10</span>
-                </div>
-              </div>
-            )}
-            
-            {product.saltiness > 0 && (
-              <div className="space-y-1">
-                <div className="text-sm font-medium">Salinidad</div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-secondary rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full" 
-                      style={{ width: `${(product.saltiness / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-sm">{product.saltiness}/10</span>
-                </div>
-              </div>
-            )}
-            
-            {product.smell > 0 && (
-              <div className="space-y-1">
-                <div className="text-sm font-medium">Olor</div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-secondary rounded-full h-2">
-                    <div 
-                      className="bg-purple-500 h-2 rounded-full" 
-                      style={{ width: `${(product.smell / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-sm">{product.smell}/10</span>
-                </div>
-              </div>
-            )}
-            
-            {product.effectiveness > 0 && (
-              <div className="space-y-1">
-                <div className="text-sm font-medium">Efectividad</div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-secondary rounded-full h-2">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full" 
-                      style={{ width: `${(product.effectiveness / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-sm">{product.effectiveness}/10</span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Additional Info */}
-          <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
-            <div className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
-              <span>
-                {product.createdAt ? new Date(product.createdAt).toLocaleDateString('es-ES') : 'Fecha no disponible'}
-              </span>
-            </div>
-            {product.userId && (
               <div className="flex items-center gap-1">
-                <User className="h-3 w-3" />
-                <span>Contribuidor #{product.userId}</span>
+                <span className="text-pink-500">🍬</span>
+                <span>{product.sweetness}/10</span>
+              </div>
+            )}
+            {product.saltiness > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="text-blue-500">🧂</span>
+                <span>{product.saltiness}/10</span>
+              </div>
+            )}
+            {product.smell > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="text-purple-500">👃</span>
+                <span>{product.smell}/10</span>
+              </div>
+            )}
+            {product.effectiveness > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="text-green-500">✨</span>
+                <span>{product.effectiveness}/10</span>
               </div>
             )}
           </div>

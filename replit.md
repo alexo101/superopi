@@ -61,9 +61,11 @@ Superopi is a full-stack web application for rating and reviewing supermarket pr
 - **Upload Form**: Multi-step form with image upload and validation
 - **Authentication Pages**: Login/register forms with validation
 - **User Profile**: Top-right dropdown with user info and logout
-- **Bottom Navigation**: Four-section navigation (Inicio, Tops, Subir, Mis Opis)
+- **Bottom Navigation**: Five-section navigation (Inicio, Tops, Subir, Trending, Mis Opis)
 - **Leaderboard**: Top contributors ranking by contribution count
 - **User Contributions**: Personal product history with detailed view
+- **Trending Products**: Products sorted by review count with fire icon navigation
+- **Compact Product Cards**: Optimized for mobile viewing with reduced size and simplified layout
 
 ### UI System
 - **Design System**: shadcn/ui components with Radix UI primitives
