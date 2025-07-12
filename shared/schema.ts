@@ -38,12 +38,13 @@ export const products = pgTable("products", {
   categoryId: integer("category_id").notNull(),
   supermarket: text("supermarket").notNull(),
   imageUrl: text("image_url").notNull(),
-  sweetness: integer("sweetness").notNull().default(5),
-  saltiness: integer("saltiness").notNull().default(5),
-  smell: integer("smell").notNull().default(5),
-  effectiveness: integer("effectiveness").notNull().default(5),
+  sweetness: integer("sweetness").notNull().default(0),
+  saltiness: integer("saltiness").notNull().default(0),
+  smell: integer("smell").notNull().default(0),
+  effectiveness: integer("effectiveness").notNull().default(0),
   price: decimal("price", { precision: 10, scale: 2 }),
   userId: integer("user_id").references(() => users.id),
+  reviewCount: integer("review_count").notNull().default(1),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

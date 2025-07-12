@@ -7,6 +7,7 @@ export interface IStorage {
   getProductsByCategory(categoryId: number): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
   searchProducts(query: string): Promise<Product[]>;
+  getTrendingProducts(): Promise<Product[]>;
   
   // User authentication methods
   getUserByEmail(email: string): Promise<User | undefined>;
@@ -106,6 +107,14 @@ export class DatabaseStorage implements IStorage {
       ...user,
       rank: index + 1,
     }));
+  }
+
+  async getTrendingProducts(): Promise<Product[]> {
+    return await db
+      .select()
+      .from(products)
+      .orderBy(sql`${products.reviewCount} DESC`)
+      .limit(20);
   }
 }
 

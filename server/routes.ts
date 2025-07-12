@@ -109,6 +109,16 @@ export async function registerRoutes(app: Express) {
     }
   });
 
+  app.get("/api/trending", async (req, res) => {
+    try {
+      const trendingProducts = await storage.getTrendingProducts();
+      res.json(trendingProducts);
+    } catch (error) {
+      console.error("Error fetching trending products:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

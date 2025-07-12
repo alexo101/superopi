@@ -12,6 +12,7 @@ import Category from "@/pages/category";
 import Auth from "@/pages/auth";
 import Tops from "@/pages/tops";
 import MyOpis from "@/pages/my-opis";
+import Trending from "@/pages/trending";
 import TopBar from "@/components/top-bar";
 
 function Router() {
@@ -41,6 +42,11 @@ function Router() {
       <Route path="/my-opis">
         <ProtectedRoute>
           <MyOpis />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/trending">
+        <ProtectedRoute>
+          <Trending />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />

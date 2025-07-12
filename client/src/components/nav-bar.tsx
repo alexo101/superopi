@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, PlusCircle, Trophy, BookOpen } from "lucide-react";
+import { Home, PlusCircle, Trophy, BookOpen, Flame } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function NavBar() {
@@ -25,6 +25,11 @@ export default function NavBar() {
           <Link href="/upload" className={`flex flex-col items-center ${location === "/upload" ? "text-primary" : "text-gray-600"}`}>
             <PlusCircle className="h-6 w-6" />
             <span className="text-xs mt-1">Subir</span>
+          </Link>
+          
+          <Link href="/trending" className={`flex flex-col items-center ${location === "/trending" ? "text-orange-500" : "text-gray-600"}`}>
+            <Flame className="h-6 w-6" />
+            <span className="text-xs mt-1">Trending</span>
           </Link>
           
           <Link href="/my-opis" className={`flex flex-col items-center ${location === "/my-opis" ? "text-primary" : "text-gray-600"}`}>

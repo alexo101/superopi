@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Star, MapPin, Calendar, User } from "lucide-react";
+import { Star, MapPin, Calendar, User, MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@shared/schema";
 import { categories } from "@shared/schema";
@@ -56,10 +56,16 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Overall Rating */}
-          <div className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-yellow-400 fill-current" />
-            <span className="text-xl font-semibold">{product.rating}/10</span>
-            <span className="text-sm text-muted-foreground">Valoración general</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-yellow-400 fill-current" />
+              <span className="text-xl font-semibold">{product.rating}/10</span>
+              <span className="text-sm text-muted-foreground">Valoración general</span>
+            </div>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <MessageCircle className="h-4 w-4" />
+              <span className="text-sm">{product.reviewCount || 1} opiniones</span>
+            </div>
           </div>
 
           {/* Detailed Ratings */}
