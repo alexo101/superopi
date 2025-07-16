@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { insertProductSchema, supermarkets, categories } from "@shared/schema";
+import { insertProductSchema, supermarkets, categories, Product } from "@shared/schema";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ProductMatcher from "@/components/product-matcher";
 
 export default function Upload() {
   const [_, setLocation] = useLocation();
@@ -20,6 +21,9 @@ export default function Upload() {
   const queryClient = useQueryClient();
   const [supermarketSearch, setSupermarketSearch] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isUpdatingExisting, setIsUpdatingExisting] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(insertProductSchema),
@@ -38,44 +42,92 @@ export default function Upload() {
     },
   });
 
+  const handleProductSelect = (product: Product) => {
+    setSelectedProduct(product);
+    setIsUpdatingExisting(true);
+    
+    // Auto-populate fields
+    form.setValue("name", product.name);
+    form.setValue("brand", product.brand);
+    form.setValue("categoryId", product.categoryId);
+    form.setValue("imageUrl", product.imageUrl);
+    
+    // Clear fields that user needs to fill
+    form.setValue("supermarket", "");
+    form.setValue("price", 0);
+    form.setValue("rating", 0);
+    form.setValue("sweetness", 0);
+    form.setValue("saltiness", 0);
+    form.setValue("smell", 0);
+    form.setValue("effectiveness", 0);
+    
+    setSearchTerm("");
+  };
+
   const mutation = useMutation({
     mutationFn: async (data: any) => {
-      if (!selectedFile) {
-        throw new Error("Por favor, selecciona una imagen");
+      if (isUpdatingExisting && selectedProduct) {
+        // Update existing product rating
+        const ratingData = {
+          rating: data.rating,
+          sweetness: data.sweetness,
+          saltiness: data.saltiness,
+          smell: data.smell,
+          effectiveness: data.effectiveness,
+        };
+        const res = await apiRequest("POST", `/api/products/${selectedProduct.id}/rate`, ratingData);
+        return res.json();
+      } else {
+        // Create new product
+        if (!selectedFile) {
+          throw new Error("Por favor, selecciona una imagen");
+        }
+
+        // First, upload the image
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          throw new Error("Error al subir la imagen");
+        }
+
+        const { imageUrl } = await uploadRes.json();
+
+        // Then, create the product with the image URL
+        const productData = {
+          ...data,
+          imageUrl,
+        };
+        const res = await apiRequest("POST", "/api/products", productData);
+        return res.json();
       }
-
-      // First, upload the image
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!uploadRes.ok) {
-        throw new Error("Error al subir la imagen");
-      }
-
-      const { imageUrl } = await uploadRes.json();
-
-      // Then, create the product with the image URL
-      const productData = {
-        ...data,
-        imageUrl,
-      };
-      const res = await apiRequest("POST", "/api/products", productData);
-      return res.json();
     },
     onSuccess: (data) => {
       // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       queryClient.invalidateQueries({ queryKey: ["/api/products/category"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/products/match"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trending"] });
       
       toast({
-        title: "Opinión añadida",
-        description: "Tu producto ha sido añadido al catálogo",
+        title: isUpdatingExisting ? "¡Opinión añadida!" : "¡Producto subido!",
+        description: isUpdatingExisting 
+          ? "Tu opinión ha sido añadida y promediada con las existentes."
+          : "Tu producto ha sido añadido exitosamente.",
       });
+      
+      // Reset form
+      form.reset();
+      setSelectedFile(null);
+      setSelectedProduct(null);
+      setIsUpdatingExisting(false);
+      setSearchTerm("");
+      
       setLocation("/");
     },
     onError: (error) => {
@@ -101,18 +153,62 @@ export default function Upload() {
   return (
     <div className="max-w-xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold">Dame tu Opi</h1>
+      
+      {!isUpdatingExisting && (
+        <ProductMatcher
+          onProductSelect={handleProductSelect}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
+      )}
+      
+      {isUpdatingExisting && selectedProduct && (
+        <div className="border rounded-lg p-4 bg-primary/5">
+          <h3 className="font-semibold mb-2">Producto seleccionado:</h3>
+          <div className="flex items-center gap-3">
+            <img 
+              src={selectedProduct.imageUrl} 
+              alt={selectedProduct.name} 
+              className="w-16 h-16 object-cover rounded"
+            />
+            <div>
+              <p className="font-medium">{selectedProduct.name}</p>
+              <p className="text-sm text-muted-foreground">{selectedProduct.brand}</p>
+            </div>
+          </div>
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            className="mt-3"
+            onClick={() => {
+              setIsUpdatingExisting(false);
+              setSelectedProduct(null);
+              form.reset();
+            }}
+          >
+            Cambiar producto
+          </Button>
+        </div>
+      )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit((data) => {
           console.log("Form data:", data);
           console.log("Form errors:", form.formState.errors);
           mutation.mutate(data);
         })} className="space-y-4">
-          <div>
-            <Input placeholder="Nombre del producto" {...form.register("name")} />
-          </div>
-          <div>
-            <Input placeholder="Marca" {...form.register("brand")} />
-          </div>
+          
+          {!isUpdatingExisting && (
+            <>
+              <div>
+                <Input placeholder="Nombre del producto" {...form.register("name")} />
+              </div>
+              <div>
+                <Input placeholder="Marca" {...form.register("brand")} />
+              </div>
+            </>
+          )}
           <div>
             <Select
               value={form.watch("supermarket")}
@@ -140,23 +236,25 @@ export default function Upload() {
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Select
-              value={form.watch("categoryId").toString()}
-              onValueChange={(value) => form.setValue("categoryId", parseInt(value))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.icon} {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!isUpdatingExisting && (
+            <div>
+              <Select
+                value={form.watch("categoryId").toString()}
+                onValueChange={(value) => form.setValue("categoryId", parseInt(value))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.icon} {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div>
             <Input 
               placeholder="Precio (€)" 
@@ -272,20 +370,25 @@ export default function Upload() {
               </TooltipProvider>
             </div>
           )}
-          <div>
-            <label className="block text-sm font-medium mb-2">Subir foto</label>
-            <Input 
-              type="file" 
-              accept="image/*"
-              onChange={handleFileChange}
-              className="cursor-pointer"
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              Formatos aceptados: JPG, PNG, GIF
-            </p>
-          </div>
+          {!isUpdatingExisting && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Subir foto</label>
+              <Input 
+                type="file" 
+                accept="image/*"
+                onChange={handleFileChange}
+                className="cursor-pointer"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                Formatos aceptados: JPG, PNG, GIF
+              </p>
+            </div>
+          )}
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Subiendo..." : "Subir Producto"}
+            {mutation.isPending 
+              ? (isUpdatingExisting ? "Enviando opinión..." : "Subiendo...")
+              : (isUpdatingExisting ? "Enviar Opinión" : "Subir Producto")
+            }
           </Button>
         </form>
       </Form>

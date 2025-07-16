@@ -18,6 +18,10 @@ export interface IStorage {
   // User contributions methods
   getProductsByUser(userId: number): Promise<Product[]>;
   getTopContributors(): Promise<{ username: string; contributions: number; rank: number }[]>;
+  
+  // Product matching methods
+  findExactProductMatches(name: string): Promise<Product[]>;
+  updateProductRating(productId: number, newRating: number, sweetness: number, saltiness: number, smell: number, effectiveness: number): Promise<Product>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -115,6 +119,45 @@ export class DatabaseStorage implements IStorage {
       .from(products)
       .orderBy(sql`${products.reviewCount} DESC`)
       .limit(20);
+  }
+
+  async findExactProductMatches(name: string): Promise<Product[]> {
+    const results = await db.select().from(products).where(like(products.name, `%${name}%`));
+    return results;
+  }
+
+  async updateProductRating(productId: number, newRating: number, sweetness: number, saltiness: number, smell: number, effectiveness: number): Promise<Product> {
+    // First get the current product to calculate averages
+    const [currentProduct] = await db.select().from(products).where(eq(products.id, productId));
+    
+    if (!currentProduct) {
+      throw new Error("Product not found");
+    }
+
+    const currentReviews = currentProduct.reviewCount;
+    const newReviews = currentReviews + 1;
+
+    // Calculate new averages
+    const newAvgRating = Math.round(((currentProduct.rating * currentReviews) + newRating) / newReviews);
+    const newAvgSweetness = Math.round(((currentProduct.sweetness * currentReviews) + sweetness) / newReviews);
+    const newAvgSaltiness = Math.round(((currentProduct.saltiness * currentReviews) + saltiness) / newReviews);
+    const newAvgSmell = Math.round(((currentProduct.smell * currentReviews) + smell) / newReviews);
+    const newAvgEffectiveness = Math.round(((currentProduct.effectiveness * currentReviews) + effectiveness) / newReviews);
+
+    const [updatedProduct] = await db
+      .update(products)
+      .set({
+        rating: newAvgRating,
+        sweetness: newAvgSweetness,
+        saltiness: newAvgSaltiness,
+        smell: newAvgSmell,
+        effectiveness: newAvgEffectiveness,
+        reviewCount: newReviews
+      })
+      .where(eq(products.id, productId))
+      .returning();
+
+    return updatedProduct;
   }
 }
 

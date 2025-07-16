@@ -72,6 +72,15 @@ export async function registerRoutes(app: Express) {
     res.json(products);
   });
 
+  app.get("/api/products/match", async (req, res) => {
+    const name = req.query.name as string;
+    if (!name) {
+      return res.status(400).json({ message: "Se requiere un nombre de producto" });
+    }
+    const products = await storage.findExactProductMatches(name);
+    res.json(products);
+  });
+
   app.post("/api/products", requireAuth, async (req: any, res) => {
     try {
       const userId = req.session?.userId;
@@ -84,6 +93,31 @@ export async function registerRoutes(app: Express) {
         return res.status(400).json({ message: "Datos del producto inválidos", errors: error.errors });
       }
       throw error;
+    }
+  });
+
+  app.post("/api/products/:id/rate", requireAuth, async (req: any, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const { rating, sweetness, saltiness, smell, effectiveness } = req.body;
+      
+      if (isNaN(productId)) {
+        return res.status(400).json({ message: "ID de producto inválido" });
+      }
+
+      const updatedProduct = await storage.updateProductRating(
+        productId,
+        rating,
+        sweetness,
+        saltiness,
+        smell,
+        effectiveness
+      );
+      
+      res.json(updatedProduct);
+    } catch (error) {
+      console.error("Error updating product rating:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
     }
   });
 
