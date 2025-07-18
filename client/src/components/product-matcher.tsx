@@ -19,6 +19,13 @@ export default function ProductMatcher({ onProductSelect, searchTerm, onSearchCh
 
   const { data: matchedProducts = [], isLoading } = useQuery({
     queryKey: ["/api/products/match", searchTerm],
+    queryFn: async () => {
+      const response = await fetch(`/api/products/match?name=${encodeURIComponent(searchTerm)}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      return response.json();
+    },
     enabled: searchTerm.length > 2,
   });
 
